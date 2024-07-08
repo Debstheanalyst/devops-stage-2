@@ -1,20 +1,65 @@
-# Full-Stack FastAPI and React Template
+Here’s a streamlined overview of the Docker Compose configuration and its rationale:
 
-Welcome to the Full-Stack FastAPI and React template repository. This repository serves as a demo application for interns, showcasing how to set up and run a full-stack application with a FastAPI backend and a ReactJS frontend using ChakraUI.
+**Services:**
+- **Postgres**
+  - Image: postgres:13
+  - Environment: Database name, user, password
+  - Volumes: Ensures data persistence
+  - Ports: Exposes 5432
 
-## Project Structure
+- **Backend**
+  - Build: Backend directory for image build
+  - Volumes: Mounts for live changes
+  - Ports: Exposes 8000
+  - Depends On: Postgres
+  - Environment: Database connection, CORS settings
 
-The repository is organized into two main directories:
+- **Frontend**
+  - Build: Frontend directory
+  - Command: npm run dev
+  - Volumes: Mounts frontend directory
+  - Ports: Exposes 5173
 
-- **frontend**: Contains the ReactJS application.
-- **backend**: Contains the FastAPI application and PostgreSQL database integration.
+- **NGINX**
+  - Image: Latest NGINX
+  - Volumes: Custom NGINX config file
+  - Depends On: Frontend, Backend
 
-Each directory has its own README file with detailed instructions specific to that part of the application.
+- **Adminer**
+  - Image: Latest Adminer
+  - Restart: Always
+  - Ports: Exposes 8080
+  - Environment: Default database server
 
-## Getting Started
+- **NGINX Proxy Manager**
+  - Image: Latest NGINX Proxy Manager
+  - Restart: Unless manually stopped
+  - Ports: Exposes 81, 80, 443
+  - Volumes: Proxy config, SSL certs
+  - Depends On: NGINX, Adminer
 
-To get started with this template, please follow the instructions in the respective directories:
+**Volumes:**
+- postgres_data: Persistent storage for PostgreSQL
 
-- [Frontend README](./frontend/README.md)
-- [Backend README](./backend/README.md)
+**NGINX and NGINX Proxy Manager:**
+- **NGINX:**
+  - Reverse Proxy: Routes requests based on URL patterns
+  - Static File Serving: Efficiently serves static files
+  - SSL Termination: Handles HTTPS requests
 
+- **NGINX Proxy Manager:**
+  - Interface: Web-based management for proxies, domains, SSL
+  - SSL Management: Simplifies SSL certificate handling
+  - Access Control: Easy setup for security and redirections
+
+**How to Run:**
+- Clone repo: `git clone https://github.com/your-username/your-repo.git`
+- Build and run: `docker-compose up --build`
+- Access:
+  - Frontend: http://localhost:5173
+  - Backend: http://localhost:8000
+  - Adminer: http://localhost:8080
+  - NGINX Proxy Manager: http://localhost:81
+
+**Conclusion:**
+This Docker setup with NGINX and NGINX Proxy Manager ensures scalable, secure, and manageable full-stack web applications suitable for both development and production environments.
